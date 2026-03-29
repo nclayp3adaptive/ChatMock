@@ -64,6 +64,7 @@ For an always-on VM deployment, the repo's Docker Compose setup now defaults to:
 - building from the checked-out source
 - binding only to `127.0.0.1`
 - reusing a host auth directory mounted at `/data`
+- joining `librechat-network` for private reverse-proxy access
 - `gpt-5.4` with `xhigh` reasoning by default in this fork
 
 <br>

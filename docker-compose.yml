@@ -14,6 +14,9 @@ services:
     volumes:
       - ${CHATMOCK_DATA_DIR:-./data}:/data
       - ./prompt.md:/app/prompt.md:ro
+    networks:
+      - default
+      - librechat-network
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health').status==200 else 1)\" "]
       interval: 10s
@@ -34,3 +37,9 @@ services:
       - ${CHATMOCK_DATA_DIR:-./data}:/data
     ports:
       - "${CHATMOCK_BIND_IP:-127.0.0.1}:1455:1455"
+    networks:
+      - default
+
+networks:
+  librechat-network:
+    external: true

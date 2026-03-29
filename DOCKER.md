@@ -20,6 +20,7 @@
 4) Free to use it in whichever chat app you like!
 
 By default the compose file binds only to `127.0.0.1`, so the API is private unless you intentionally put it behind a reverse proxy or SSH tunnel.
+The service also joins the shared `librechat-network` so an internal nginx proxy can reach it without exposing the container broadly.
 
 ## Configuration
 Set options in `.env` or pass environment variables:
