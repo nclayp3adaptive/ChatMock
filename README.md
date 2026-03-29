@@ -60,6 +60,12 @@ chatmock serve
 
 The server runs at `http://127.0.0.1:8000` by default. Use `http://127.0.0.1:8000/v1` as your base URL for OpenAI-compatible apps.
 
+For an always-on VM deployment, the repo's Docker Compose setup now defaults to:
+- building from the checked-out source
+- binding only to `127.0.0.1`
+- reusing a host auth directory mounted at `/data`
+- `gpt-5.4` with `xhigh` reasoning by default in this fork
+
 <br>
 
 ## Usage
