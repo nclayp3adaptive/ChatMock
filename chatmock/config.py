@@ -8,6 +8,9 @@ from pathlib import Path
 CLIENT_ID_DEFAULT = os.getenv("CHATGPT_LOCAL_CLIENT_ID") or "app_EMoamEEZ73f0CkXaXp7hrann"
 OAUTH_ISSUER_DEFAULT = os.getenv("CHATGPT_LOCAL_ISSUER") or "https://auth.openai.com"
 OAUTH_TOKEN_URL = f"{OAUTH_ISSUER_DEFAULT}/oauth/token"
+DEFAULT_MODEL_LOCK = os.getenv("CHATGPT_LOCAL_DEBUG_MODEL") or "gpt-5.4"
+DEFAULT_REASONING_EFFORT = os.getenv("CHATGPT_LOCAL_REASONING_EFFORT", "xhigh").lower()
+LOCK_REQUEST_REASONING = (os.getenv("CHATGPT_LOCAL_LOCK_REASONING_EFFORT", "true").strip().lower() in ("1", "true", "yes", "on"))
 
 CHATGPT_RESPONSES_URL = "https://chatgpt.com/backend-api/codex/responses"
 

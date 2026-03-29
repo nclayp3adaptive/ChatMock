@@ -9,16 +9,22 @@ import webbrowser
 from datetime import datetime
 
 from .app import create_app
-from .config import CLIENT_ID_DEFAULT
+from .config import CLIENT_ID_DEFAULT, DEFAULT_MODEL_LOCK, DEFAULT_REASONING_EFFORT
 from .limits import RateLimitWindow, compute_reset_at, load_rate_limit_snapshot
 from .oauth import OAuthHTTPServer, OAuthHandler, REQUIRED_PORT, URL_BASE
 from .utils import eprint, get_home_dir, load_chatgpt_tokens, parse_jwt_claims, read_auth_file
 
 
 _STATUS_LIMIT_BAR_SEGMENTS = 30
-_STATUS_LIMIT_BAR_FILLED = "█"
-_STATUS_LIMIT_BAR_EMPTY = "░"
-_STATUS_LIMIT_BAR_PARTIAL = "▓"
+_STATUS_LIMIT_BAR_FILLED = "#"
+_STATUS_LIMIT_BAR_EMPTY = "-"
+_STATUS_LIMIT_BAR_PARTIAL = "="
+_ACCOUNT_HEADING = "Account"
+_USAGE_LIMITS_HEADING = "Usage Limits"
+_PRIMARY_LIMIT_LABEL = "[5h]"
+_SECONDARY_LIMIT_LABEL = "[7d]"
+_RESETS_LABEL = "Resets"
+_LIST_BULLET = "-"
 
 
 def _clamp_percent(value: float) -> float:
@@ -134,7 +140,7 @@ def _format_local_datetime(dt: datetime) -> str:
 def _print_usage_limits_block() -> None:
     stored = load_rate_limit_snapshot()
     
-    print("📊 Usage Limits")
+    print(_USAGE_LIMITS_HEADING)
     
     if stored is None:
         print("  No usage data available yet. Send a request through ChatMock first.")
@@ -147,9 +153,9 @@ def _print_usage_limits_block() -> None:
 
     windows: list[tuple[str, str, RateLimitWindow]] = []
     if stored.snapshot.primary is not None:
-        windows.append(("⚡", "5 hour limit", stored.snapshot.primary))
+        windows.append((_PRIMARY_LIMIT_LABEL, "5 hour limit", stored.snapshot.primary))
     if stored.snapshot.secondary is not None:
-        windows.append(("📅", "Weekly limit", stored.snapshot.secondary))
+        windows.append((_SECONDARY_LIMIT_LABEL, "Weekly limit", stored.snapshot.secondary))
 
     if not windows:
         print("  Usage data was captured but no limit windows were provided.")
@@ -177,12 +183,12 @@ def _print_usage_limits_block() -> None:
         
         if reset_in and reset_at:
             reset_at_str = _format_local_datetime(reset_at)
-            print(f"    ⏳ Resets in: {reset_in} at {reset_at_str}")
+            print(f"    {_RESETS_LABEL} in: {reset_in} at {reset_at_str}")
         elif reset_in:
-            print(f"    ⏳ Resets in: {reset_in}")
+            print(f"    {_RESETS_LABEL} in: {reset_in}")
         elif reset_at:
             reset_at_str = _format_local_datetime(reset_at)
-            print(f"    ⏳ Resets at: {reset_at_str}")
+            print(f"    {_RESETS_LABEL} at: {reset_at_str}")
 
     print()
 
@@ -233,7 +239,7 @@ def cmd_login(no_browser: bool, verbose: bool) -> int:
                     if state and state != httpd.state:
                         eprint("State mismatch. Ignoring pasted URL for safety.")
                         return
-                    eprint("Received redirect URL. Completing login without callback…")
+                    eprint("Received redirect URL. Completing login without callback...")
                     bundle, _ = httpd.exchange_code(code)
                     if httpd.persist_auth(bundle):
                         httpd.exit_code = 0
@@ -308,7 +314,7 @@ def main() -> None:
     p_serve.add_argument(
         "--debug-model",
         dest="debug_model",
-        default=os.getenv("CHATGPT_LOCAL_DEBUG_MODEL"),
+        default=DEFAULT_MODEL_LOCK,
         help="Forcibly override requested 'model' with this value",
     )
     p_serve.add_argument(
@@ -320,8 +326,8 @@ def main() -> None:
     p_serve.add_argument(
         "--reasoning-effort",
         choices=["none", "minimal", "low", "medium", "high", "xhigh"],
-        default=os.getenv("CHATGPT_LOCAL_REASONING_EFFORT", "medium").lower(),
-        help="Reasoning effort level for Responses API (default: medium)",
+        default=DEFAULT_REASONING_EFFORT,
+        help="Reasoning effort level for Responses API (default: xhigh)",
     )
     p_serve.add_argument(
         "--reasoning-summary",
@@ -387,9 +393,9 @@ def main() -> None:
             sys.exit(0)
         access_token, account_id, id_token = load_chatgpt_tokens()
         if not access_token or not id_token:
-            print("👤 Account")
-            print("  • Not signed in")
-            print("  • Run: python3 chatmock.py login")
+            print(_ACCOUNT_HEADING)
+            print(f"  {_LIST_BULLET} Not signed in")
+            print(f"  {_LIST_BULLET} Run: chatmock login")
             print("")
             _print_usage_limits_block()
             sys.exit(0)
@@ -408,12 +414,12 @@ def main() -> None:
         }
         plan = plan_map.get(str(plan_raw).lower(), str(plan_raw).title() if isinstance(plan_raw, str) else "Unknown")
 
-        print("👤 Account")
-        print("  • Signed in with ChatGPT")
-        print(f"  • Login: {email}")
-        print(f"  • Plan: {plan}")
+        print(_ACCOUNT_HEADING)
+        print(f"  {_LIST_BULLET} Signed in with ChatGPT")
+        print(f"  {_LIST_BULLET} Login: {email}")
+        print(f"  {_LIST_BULLET} Plan: {plan}")
         if account_id:
-            print(f"  • Account ID: {account_id}")
+            print(f"  {_LIST_BULLET} Account ID: {account_id}")
         print("")
         _print_usage_limits_block()
         sys.exit(0)

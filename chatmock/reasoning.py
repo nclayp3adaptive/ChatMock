@@ -11,6 +11,7 @@ def build_reasoning_param(
     overrides: Dict[str, Any] | None = None,
     *,
     allowed_efforts: frozenset[str] | None = None,
+    allow_overrides: bool = True,
 ) -> Dict[str, Any]:
     effort = (base_effort or "").strip().lower()
     summary = (base_summary or "").strip().lower()
@@ -18,7 +19,7 @@ def build_reasoning_param(
     valid_efforts = allowed_efforts or DEFAULT_REASONING_EFFORTS
     valid_summaries = {"auto", "concise", "detailed", "none"}
 
-    if isinstance(overrides, dict):
+    if allow_overrides and isinstance(overrides, dict):
         o_eff = str(overrides.get("effort", "")).strip().lower()
         o_sum = str(overrides.get("summary", "")).strip().lower()
         if o_eff in valid_efforts and o_eff:

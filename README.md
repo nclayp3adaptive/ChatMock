@@ -49,6 +49,15 @@ chatmock login
 chatmock serve
 ```
 
+If you already use Codex CLI, ChatMock can reuse the auth stored in `~/.codex/auth.json`.
+
+PowerShell example:
+
+```powershell
+$env:CHATGPT_LOCAL_HOME="$HOME\\.codex"
+chatmock serve
+```
+
 The server runs at `http://127.0.0.1:8000` by default. Use `http://127.0.0.1:8000/v1` as your base URL for OpenAI-compatible apps.
 
 <br>

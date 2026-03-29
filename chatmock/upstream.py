@@ -18,7 +18,7 @@ from .utils import get_effective_chatgpt_auth
 
 def _log_json(prefix: str, payload: Any) -> None:
     try:
-        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=False)}")
+        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=True)}")
     except Exception:
         try:
             print(f"{prefix}\n{payload}")
@@ -42,7 +42,7 @@ def start_upstream_request(
             jsonify(
                 {
                     "error": {
-                        "message": "Missing ChatGPT credentials. Run 'python3 chatmock.py login' first.",
+                        "message": "Missing ChatGPT credentials. Run 'chatmock login' first.",
                     }
                 }
             ),
@@ -122,7 +122,7 @@ def start_upstream_raw_request(
             jsonify(
                 {
                     "error": {
-                        "message": "Missing ChatGPT credentials. Run 'python3 chatmock.py login' first.",
+                        "message": "Missing ChatGPT credentials. Run 'chatmock login' first.",
                     }
                 }
             ),

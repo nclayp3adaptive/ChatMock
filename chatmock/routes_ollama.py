@@ -28,7 +28,7 @@ ollama_bp = Blueprint("ollama", __name__)
 
 def _log_json(prefix: str, payload: Any) -> None:
     try:
-        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=False)}")
+        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=True)}")
     except Exception:
         try:
             print(f"{prefix}\n{payload}")
@@ -276,6 +276,7 @@ def ollama_chat() -> Response:
             reasoning_summary,
             model_reasoning,
             allowed_efforts=allowed_efforts_for_model(model),
+            allow_overrides=not bool(current_app.config.get("LOCK_REQUEST_REASONING")),
         ),
         service_tier=service_tier_resolution.service_tier,
     )
@@ -317,6 +318,7 @@ def ollama_chat() -> Response:
                     reasoning_summary,
                     model_reasoning,
                     allowed_efforts=allowed_efforts_for_model(model),
+                    allow_overrides=not bool(current_app.config.get("LOCK_REQUEST_REASONING")),
                 ),
                 service_tier=service_tier_resolution.service_tier,
             )
@@ -337,7 +339,7 @@ def ollama_chat() -> Response:
             return jsonify(err), upstream.status_code
 
     created_at = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    model_out = model if isinstance(model, str) and model.strip() else normalized_model
+    model_out = normalized_model
 
     if stream_req:
         def _gen():

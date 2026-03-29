@@ -45,7 +45,7 @@ openai_bp = Blueprint("openai", __name__)
 
 def _log_json(prefix: str, payload: Any) -> None:
     try:
-        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=False)}")
+        print(f"{prefix}\n{json.dumps(payload, indent=2, ensure_ascii=True)}")
     except Exception:
         try:
             print(f"{prefix}\n{payload}")
@@ -211,6 +211,7 @@ def chat_completions() -> Response:
         reasoning_summary,
         reasoning_overrides,
         allowed_efforts=allowed_efforts_for_model(model),
+        allow_overrides=not bool(current_app.config.get("LOCK_REQUEST_REASONING")),
     )
     service_tier, tier_error = _service_tier_from_payload(model, payload, verbose=verbose)
     if tier_error is not None:
@@ -290,7 +291,7 @@ def chat_completions() -> Response:
             print("OUT POST /v1/chat/completions (streaming response)")
         stream_iter = sse_translate_chat(
             upstream,
-            requested_model or model,
+            model,
             created,
             verbose=verbose_obfuscation,
             vlog=print if verbose_obfuscation else None,
@@ -390,7 +391,7 @@ def chat_completions() -> Response:
         "id": response_id or "chatcmpl",
         "object": "chat.completion",
         "created": created,
-        "model": requested_model or model,
+        "model": model,
         "choices": [
             {
                 "index": 0,
@@ -450,6 +451,7 @@ def completions() -> Response:
         reasoning_summary,
         reasoning_overrides,
         allowed_efforts=allowed_efforts_for_model(model),
+        allow_overrides=not bool(current_app.config.get("LOCK_REQUEST_REASONING")),
     )
     service_tier, tier_error = _service_tier_from_payload(model, payload, verbose=verbose)
     if tier_error is not None:
@@ -493,7 +495,7 @@ def completions() -> Response:
             print("OUT POST /v1/completions (streaming response)")
         stream_iter = sse_translate_text(
             upstream,
-            requested_model or model,
+            model,
             created,
             verbose=verbose_obfuscation,
             vlog=(print if verbose_obfuscation else None),
@@ -557,7 +559,7 @@ def completions() -> Response:
         "id": response_id or "cmpl",
         "object": "text_completion",
         "created": created,
-        "model": requested_model or model,
+        "model": model,
         "choices": [
             {"index": 0, "text": full_text, "finish_reason": "stop", "logprobs": None}
         ],

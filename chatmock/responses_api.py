@@ -113,6 +113,7 @@ def normalize_responses_payload(
         reasoning_summary,
         reasoning_overrides,
         allowed_efforts=allowed_efforts_for_model(normalized_model),
+        allow_overrides=not bool(config.get("LOCK_REQUEST_REASONING")),
     )
 
     include = normalized.get("include")

@@ -51,7 +51,7 @@ class FakeUpstream:
 class RouteTests(unittest.TestCase):
     def setUp(self) -> None:
         reset_session_state()
-        self.app = create_app()
+        self.app = create_app(debug_model=None, reasoning_effort="medium")
         self.client = self.app.test_client()
 
     def test_openai_models_list(self) -> None:
@@ -89,7 +89,7 @@ class RouteTests(unittest.TestCase):
         body = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body["choices"][0]["message"]["content"], "hello")
-        self.assertEqual(body["model"], "gpt5.4-mini")
+        self.assertEqual(body["model"], "gpt-5.4-mini")
 
     @patch("chatmock.routes_openai.start_upstream_request")
     def test_chat_completions_honors_debug_model_override(self, mock_start) -> None:
